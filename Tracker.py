@@ -1,14 +1,15 @@
 import requests
 
-# Your Google Apps Script Web App URL
-url = 'https://script.google.com/macros/s/AKfycbzhvkipYZQnhU_reWDWhbT1Hgqub5r9L7Ge5b5zbxZQpuCu58PTZoV7WuKAuL-ajjmo/exec'
+# Your Google Apps Script Web App URL for POST requests
+post_url = 'https://script.google.com/macros/s/AKfycbwPJGLgGs90ElZAL6bOE2109_SHQrT7efS4m8ArDGO1qynK5EAft6wOk7i9LNilmEUb/exec'
 
-# Sending a GET request to the Web App
-response = requests.get(url)
+# Fetch team data from Google Sheets using the GET URL
+get_url = 'https://script.google.com/macros/s/AKfycbzhvkipYZQnhU_reWDWhbT1Hgqub5r9L7Ge5b5zbxZQpuCu58PTZoV7WuKAuL-ajjmo/exec'
+response = requests.get(get_url)
 
 # Checking the response
 if response.status_code == 200:
-    # Print the JSON response
+    # Get the JSON response for team data
     team_data = response.json()
     print("Team Data:", team_data)
 else:
@@ -90,8 +91,11 @@ if __name__ == "__main__":
     # Analyze pull requests and update the output
     analyze_prs(prs, output, team_data)
 
-    # Print or handle the output
-    for team, data in output.items():
-        print(f"Output for {team}:")
-        for member in data:
-            print(member)
+    # Send the output data to Google Apps Script
+    response = requests.post(post_url, json=output)
+
+    # Check the response
+    if response.status_code == 200:
+        print("Data successfully sent to Google Sheet.")
+    else:
+        print("Error:", response.status_code, response.text)
